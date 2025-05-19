@@ -1,79 +1,85 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fang die Maus</title>
+  <meta charset="utf-8">
+  <title>Fang die Maus!</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #222;
-      color: white;
-      text-align: center;
+    p {
+      width: 500px;
+      font-size: 25px;
+      text-align: left;
     }
     #spielfeld {
-      margin: 10px auto;
       height: 500px;
       width: 500px;
       background-color: #050f15;
-      border: 1px solid #0b1f2a;
       position: relative;
-      cursor: crosshair;
     }
     #maus {
       position: absolute;
-      width: 136px;
-      height: 116px;
+    }
+    #maus:hover {
+      cursor: pointer;
+    }
+    #inhalt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   </style>
 </head>
 <body>
-  <h1>Fang die Maus</h1>
-  <p>In diesem kleinen Spiel musst du nichts weiter tun, als diese kleine suesse Maus fangen. Aber Vorsicht, die Maus wird immer schneller ;)</p>
-  <p id="level">Level: 1</p>
-  <div id="spielfeld">
-    <img id="maus" src="maus.gif" onclick="punkte();">
+  <div id="inhalt">
+    <div id="spielfeld">
+      <img id="maus" src="maus.gif">
+    </div>
+    <p>Punkte: <span id="punkteAusgabe"></span></p>
+    <p>Level: <span id="levelAusgabe"></span></p>
   </div>
-  <p id="punkteAusgabe">Punkte: 0</p>
 
   <script>
-    function levellaenge() {
-      return Math.floor(7 + 15 * Math.random());
-    }
-
-    let maus = document.getElementById("maus");
+    let feld          = document.getElementById("spielfeld");
+    let maus          = document.getElementById("maus");
     let punkteAusgabe = document.getElementById("punkteAusgabe");
-    let levelAnzeige = document.getElementById("level");
-    let mausGeschwindigkeit = 1000;
-    let Punkte = 0;
-    let Level = 1;
-    let klicke = 0;
-    let laevellenge = levellaenge();
+    let levelAusgabe  = document.getElementById("levelAusgabe");
+    let geschwindigkeit = 1000;
+    let zusatz  = 1;
+    let punkte  = 0;
+    let level   = 1;
+    let treffer = 0;
 
     function mausBewegen() {
-      let maxX = 500 - 116;
-      let maxY = 500 - 136;
-      
-      maus.style.top = Math.floor(Math.random() * maxX) + "px";
-      maus.style.left = Math.floor(Math.random() * maxY) + "px";
-      setTimeout(mausBewegen, mausGeschwindigkeit);
+      let maxX = feld.offsetWidth  - maus.offsetWidth;
+      let maxY = feld.offsetHeight - maus.offsetHeight;
+      maus.style.top = Math.random() * maxY + "px";
+      maus.style.left = Math.random() * maxX + "px";
+      setTimeout(mausBewegen, geschwindigkeit);
     }
 
-    function punkte() {
-      klicke++;
-      if (klicke == laevellenge) {
-        klicke = 0;
-        Level++;
-        mausGeschwindigkeit /= (Level / 2);
-        laevellenge = levellaenge();
-      } else {
-        Punkte += 10 * Level;
+    function aktualisierePunkte() {
+      punkte += zusatz;
+      punkteAusgabe.textContent = punkte;
+    }
+
+    function aktualisiereLevel() {
+      treffer++;
+      if (treffer === 3) {
+        treffer = 0;
+        level++;
+        geschwindigkeit *= 0.9;
+        zusatz *= level;
+        levelAusgabe.textContent = level;
       }
-      punkteAusgabe.textContent = "Punkte: " + Punkte;
-      levelAnzeige.textContent = "Level: " + Level;
     }
 
-    mausBewegen();
+    maus.onload  = () => mausBewegen();
+    maus.onclick = () => {
+      aktualisierePunkte();
+      aktualisiereLevel();
+    };
+    punkteAusgabe.textContent = punkte;
+    levelAusgabe.textContent  = level;
   </script>
 </body>
 </html>
+
